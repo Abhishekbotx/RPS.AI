@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        overflow: hidden;
+        background: black;
+        height: 100%;
+        width: 100%;
+      }
+      video.input_video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        transform: scaleX(-1); /* mirror selfie view */
+      }
+      canvas.output_canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <video class="input_video" autoplay playsinline></video>
+    <canvas class="output_canvas"></canvas>
+    <script>
+      const videoElement = document.querySelector(".input_video");
+      const canvasElement = document.querySelector(".output_canvas");
+      const canvasCtx = canvasElement.getContext("2d");
+
+      function resizeCanvas() {
+        canvasElement.width = window.innerWidth;
+        canvasElement.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      const hands = new Hands({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.5,
+      });
+
+      hands.onResults((results) => {
+        // Send gesture type to RN
+        if (results.multiHandLandmarks?.length > 0) {
+          const lm = results.multiHandLandmarks[0];
+          const gesture = getGesture(lm);
+          window.ReactNativeWebView?.postMessage(gesture);
+        }
+      });
+
+      function getGesture(landmarks) {
+        let extended = 0;
+        const fingerTips = [8, 12, 16, 20];
+        const pipJoints = [6, 10, 14, 18];
+        for (let i = 0; i < 4; i++) {
+          if (landmarks[fingerTips[i]].y < landmarks[pipJoints[i]].y) extended++;
+        }
+        if (extended === 0) return "rock";
+        if (extended === 2) return "scissors";
+        if (extended >= 4) return "paper";
+        return "unknown";
+      }
+
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await hands.send({ image: videoElement });
+        },
+        width: 1280,
+        height: 720,
+      });
+      camera.start();
+    </script>
+  </body>
+</html>
