@@ -105,9 +105,4 @@ This approach keeps detection on-device, avoids TensorFlow.js bundle weight, and
 
 ---
 
-### Notes & Next Steps
-- Swap the heuristic with MediaPipe’s built-in gesture classifier or TensorFlow Lite for higher accuracy.
-- Persist scores and streaks via `AsyncStorage`.
-- Add multiplayer over WebRTC or backend validation if required.
-
 Enjoy playing Rock–Paper–Scissors with your camera! 🎮📷✊✋✌️
