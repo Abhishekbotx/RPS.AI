@@ -80,6 +80,12 @@ Sign with your keystore (update `android/app/build.gradle`) before sharing. Uplo
 
 ---
 
+### Download & Demo
+- **APK:** [Rock·Paper·Scissor·AI Android build](https://drive.google.com/file/d/1vSe7LMzjUYOU2of-2ixMst0AKKzsNVhG/view?usp=drive_link)
+- **Demo video:** [Gameplay walkthrough video](https://drive.google.com/file/d/18_71BydiHZl7bNMBNFqC7hAYiGyarRSF/view?usp=drive_link)
+
+---
+
 ### How Gesture Detection Works
 1. `CameraView` renders a `WebView` pointing to `file:///android_asset/hand.html`.
 2. Inside the HTML, MediaPipe Hands processes frames from the `<video>` element via `CameraUtils`.
